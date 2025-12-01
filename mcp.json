@@ -1,11 +1,10 @@
-
 {
   "version": "1.0.0",
   "name": "phin-isan-ai-mcp",
   "description": "Model Context Protocol configuration for Phin Isan AI platform",
   "created": "2024-12-01",
   "updated": "2024-12-01",
-  
+
   "agents": {
     "image_to_music": {
       "enabled": true,
@@ -24,7 +23,7 @@
         "style_mapping"
       ]
     },
-    
+
     "text_to_music": {
       "enabled": true,
       "model": "musicgen-medium",
@@ -54,7 +53,7 @@
         "quality_control"
       ]
     },
-    
+
     "audio_to_midi": {
       "enabled": true,
       "model": "basic-pitch",
@@ -74,7 +73,7 @@
         "midi_generation"
       ]
     },
-    
+
     "phin_feature_extraction": {
       "enabled": true,
       "model": "custom",
@@ -96,7 +95,7 @@
         "zero_crossing_rate"
       ]
     },
-    
+
     "phin_transcription": {
       "enabled": true,
       "model": "ewma",
@@ -114,7 +113,7 @@
       }
     }
   },
-  
+
   "workflows": {
     "image_to_music_pipeline": {
       "description": "Complete pipeline from image to music",
@@ -133,7 +132,7 @@
         }
       ]
     },
-    
+
     "phin_audio_processing": {
       "description": "Process Phin audio to MIDI",
       "steps": [
@@ -152,7 +151,7 @@
       ]
     }
   },
-  
+
   "models": {
     "vision_language": {
       "gpt-4-vision": {
@@ -173,7 +172,7 @@
         "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent"
       }
     },
-    
+
     "music_generation": {
       "musicgen-small": {
         "parameters": 300000000,
@@ -191,7 +190,7 @@
         "sample_rate": 32000
       }
     },
-    
+
     "audio_transcription": {
       "basic-pitch": {
         "provider": "spotify",
@@ -202,9 +201,16 @@
         "provider": "music-and-culture-tech-lab",
         "repository": "https://github.com/Music-and-Culture-Technology-Lab/omnizart"
       }
+    },
+    
+    "prompt_converter": {
+        "type": "llm",
+        "model": "qwen2.5-coder-32b-instruct",
+        "api_base": "http://localhost:8000/v1",
+        "system_prompt": "Convert the following image description into a music generation prompt focusing on mood, tempo, instrumentation, and musical genre that fits the scene."
     }
   },
-  
+
   "safety": {
     "content_filtering": {
       "enabled": true,
@@ -228,7 +234,7 @@
       "allowed_image_formats": ["jpg", "jpeg", "png", "webp"]
     }
   },
-  
+
   "performance": {
     "caching": {
       "enabled": true,
@@ -244,7 +250,7 @@
       "device": "cuda:0"
     }
   },
-  
+
   "monitoring": {
     "metrics_collection": {
       "enabled": true,
@@ -263,7 +269,7 @@
       "backup_count": 5
     }
   },
-  
+
   "datasets": {
     "phin_isan": {
       "path": "phin_ai_dataset",
@@ -313,7 +319,7 @@
       ]
     }
   },
-  
+
   "metadata": {
     "project_name": "Phin Isan AI",
     "version": "1.0.0",
