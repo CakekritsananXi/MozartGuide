@@ -6,6 +6,30 @@
 
 **AI-powered music generation platform for Thai Phin (พิณอีสาน) and general music creation.**
 
+## 🧪 Testing
+
+### Run All Tests
+```bash
+./run_tests.sh
+```
+
+### Run Quick Tests (Exclude Slow Tests)
+```bash
+pytest tests/ -v -m "not slow"
+```
+
+### Run Specific Test Files
+```bash
+pytest tests/test_music_generator.py -v
+pytest tests/test_image_analyzer.py -v
+pytest tests/test_orchestrator.py -v
+```
+
+### Run Real Data Tests
+```bash
+pytest tests/test_real_data.py -v -s
+```
+
 ## 🌟 Features
 
 - **Image-to-Music**: Generate music from static images using vision-language models
