@@ -1,4 +1,3 @@
-
 # 🎵 Phin Isan AI - Music Generation Platform
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
@@ -9,39 +8,63 @@
 
 ## 🌟 Features
 
-- **🖼️ Image-to-Music**: Generate music from images using vision-language models
-- **📝 Text-to-Music**: Create music from text prompts
-- **🎼 Audio-to-MIDI**: Convert audio files to MIDI notation
-- **🎹 Phin Isan Training**: Specialized models for Thai traditional music
-- **🔧 Model Configuration**: Easy setup for multiple AI music models
-- **📊 Dataset Management**: Tools for organizing and processing audio datasets
+- **Image-to-Music**: Generate music from static images using vision-language models
+- **Video-to-Music**: Create synchronized soundtracks for video content
+- **Audio-to-MIDI**: Transcribe Phin audio recordings to MIDI format
+- **Multi-Agent Architecture**: Modular design with specialized AI agents
+- **REST API**: FastAPI-based web service for remote access
+- **Interactive UI**: Streamlit web interface for easy usage
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Python 3.11+
-- Internet connection (for model downloads)
-
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository** (or open in Replit):
 ```bash
 git clone <your-repo-url>
 cd phin-isan-ai
 ```
 
-2. Install dependencies:
+2. **Run the setup script**:
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+Or install manually:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run the application:
+3. **Configure environment variables**:
+```bash
+cp .env.example .env
+# Edit .env and add your OPENAI_API_KEY
+```
+
+### Usage
+
+**Command Line Interface**:
+```bash
+# Generate music from an image
+python main.py --image path/to/image.jpg --output music.wav
+
+# With custom duration and guidance
+python main.py --image photo.jpg --duration 20 --guidance 4.0
+
+# Generate from text prompt
+python main.py --prompt "Calm ambient music with soft piano" --output ambient.wav
+
+# Transcribe audio to MIDI
+python main.py --audio song.wav --midi-output notes.mid
+```
+
+**Web Interface**:
 ```bash
 streamlit run app.py --server.port 5000
 ```
 
-4. Open your browser and navigate to `http://0.0.0.0:5000`
+Then open your browser to the displayed URL.
 
 ## 📖 Usage
 

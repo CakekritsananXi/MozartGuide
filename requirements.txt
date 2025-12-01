@@ -1,0 +1,37 @@
+
+# Core Dependencies
+torch>=2.0.0
+transformers>=4.30.0
+accelerate>=0.20.0
+diffusers>=0.18.0
+
+# Audio Processing
+audiocraft>=1.0.0
+scipy>=1.10.0
+soundfile>=0.12.0
+basic-pitch>=0.2.0
+
+# Image/Video Processing
+Pillow>=9.0.0
+opencv-python>=4.7.0
+moviepy>=1.0.0
+
+# Web Framework
+streamlit>=1.28.0
+fastapi>=0.100.0
+uvicorn>=0.22.0
+python-multipart>=0.0.6
+
+# LLM Integration
+openai>=1.0.0
+
+# Utilities
+pyyaml>=6.0
+tqdm>=4.65.0
+numpy>=1.24.0
+loguru>=0.7.0
+
+# Development
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
