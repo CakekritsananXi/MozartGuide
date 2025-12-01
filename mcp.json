@@ -1,0 +1,326 @@
+
+{
+  "version": "1.0.0",
+  "name": "phin-isan-ai-mcp",
+  "description": "Model Context Protocol configuration for Phin Isan AI platform",
+  "created": "2024-12-01",
+  "updated": "2024-12-01",
+  
+  "agents": {
+    "image_to_music": {
+      "enabled": true,
+      "model": "gpt-4-vision",
+      "provider": "openai",
+      "parameters": {
+        "temperature": 0.7,
+        "max_tokens": 2000,
+        "top_p": 1.0
+      },
+      "system_prompt": "You are an expert music composer and visual artist. Your task is to analyze images and create detailed music descriptions that capture the essence, mood, and atmosphere of the visual content.",
+      "capabilities": [
+        "image_understanding",
+        "music_description_generation",
+        "prompt_enhancement",
+        "style_mapping"
+      ]
+    },
+    
+    "text_to_music": {
+      "enabled": true,
+      "model": "musicgen-medium",
+      "provider": "meta",
+      "parameters": {
+        "duration": {
+          "min": 5,
+          "max": 60,
+          "default": 10
+        },
+        "guidance_scale": {
+          "min": 1.0,
+          "max": 10.0,
+          "default": 3.5
+        },
+        "temperature": {
+          "min": 0.5,
+          "max": 1.5,
+          "default": 1.0
+        },
+        "sample_rate": 32000
+      },
+      "capabilities": [
+        "prompt_understanding",
+        "style_classification",
+        "parameter_optimization",
+        "quality_control"
+      ]
+    },
+    
+    "audio_to_midi": {
+      "enabled": true,
+      "model": "basic-pitch",
+      "provider": "spotify",
+      "parameters": {
+        "onset_threshold": 0.5,
+        "frame_threshold": 0.3,
+        "minimum_note_length": 0.127,
+        "minimum_frequency": 32.7,
+        "maximum_frequency": 2093.0,
+        "melodia_trick": true
+      },
+      "capabilities": [
+        "onset_detection",
+        "pitch_detection",
+        "duration_estimation",
+        "midi_generation"
+      ]
+    },
+    
+    "phin_feature_extraction": {
+      "enabled": true,
+      "model": "custom",
+      "provider": "internal",
+      "parameters": {
+        "sample_rate": 22050,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "bins_per_octave": 7,
+        "n_mels": 128
+      },
+      "features": [
+        "mel_spectrogram",
+        "cqt_7_bins_per_octave",
+        "chroma_7_tone",
+        "onset_strength",
+        "spectral_centroid",
+        "spectral_rolloff",
+        "zero_crossing_rate"
+      ]
+    },
+    
+    "phin_transcription": {
+      "enabled": true,
+      "model": "ewma",
+      "provider": "internal",
+      "parameters": {
+        "ewma_alpha": 0.8,
+        "onset_threshold": 0.3,
+        "pitch_range": [100, 2000],
+        "duration_estimation": "onset_diff"
+      },
+      "performance_targets": {
+        "onset_f1": 0.95,
+        "pitch_f1": 0.90,
+        "note_f1": 0.85
+      }
+    }
+  },
+  
+  "workflows": {
+    "image_to_music_pipeline": {
+      "description": "Complete pipeline from image to music",
+      "steps": [
+        {
+          "agent": "image_to_music",
+          "action": "analyze_image",
+          "inputs": ["image_path", "user_prompt"],
+          "outputs": ["music_description"]
+        },
+        {
+          "agent": "text_to_music",
+          "action": "generate_music",
+          "inputs": ["music_description", "duration", "guidance_scale"],
+          "outputs": ["audio_path", "metadata"]
+        }
+      ]
+    },
+    
+    "phin_audio_processing": {
+      "description": "Process Phin audio to MIDI",
+      "steps": [
+        {
+          "agent": "phin_feature_extraction",
+          "action": "extract_features",
+          "inputs": ["audio_path"],
+          "outputs": ["features"]
+        },
+        {
+          "agent": "phin_transcription",
+          "action": "transcribe",
+          "inputs": ["audio_path", "features"],
+          "outputs": ["midi_path", "confidence"]
+        }
+      ]
+    }
+  },
+  
+  "models": {
+    "vision_language": {
+      "gpt-4-vision": {
+        "provider": "openai",
+        "api_key_env": "OPENAI_API_KEY",
+        "endpoint": "https://api.openai.com/v1/chat/completions",
+        "max_image_size": 20971520
+      },
+      "claude-3-opus": {
+        "provider": "anthropic",
+        "api_key_env": "ANTHROPIC_API_KEY",
+        "endpoint": "https://api.anthropic.com/v1/messages",
+        "max_image_size": 5242880
+      },
+      "gemini-pro-vision": {
+        "provider": "google",
+        "api_key_env": "GOOGLE_API_KEY",
+        "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent"
+      }
+    },
+    
+    "music_generation": {
+      "musicgen-small": {
+        "parameters": 300000000,
+        "context_length": 30,
+        "sample_rate": 32000
+      },
+      "musicgen-medium": {
+        "parameters": 1500000000,
+        "context_length": 30,
+        "sample_rate": 32000
+      },
+      "musicgen-large": {
+        "parameters": 3300000000,
+        "context_length": 30,
+        "sample_rate": 32000
+      }
+    },
+    
+    "audio_transcription": {
+      "basic-pitch": {
+        "provider": "spotify",
+        "repository": "https://github.com/spotify/basic-pitch",
+        "model_path": "basic_pitch/saved_models/icassp_2022"
+      },
+      "omnizart": {
+        "provider": "music-and-culture-tech-lab",
+        "repository": "https://github.com/Music-and-Culture-Technology-Lab/omnizart"
+      }
+    }
+  },
+  
+  "safety": {
+    "content_filtering": {
+      "enabled": true,
+      "filters": [
+        "violence",
+        "hate_speech",
+        "explicit_content",
+        "copyright_infringement"
+      ]
+    },
+    "rate_limiting": {
+      "enabled": true,
+      "max_requests_per_minute": 10,
+      "max_requests_per_hour": 100
+    },
+    "input_validation": {
+      "max_prompt_length": 1000,
+      "max_image_size_mb": 20,
+      "max_audio_duration_seconds": 300,
+      "allowed_audio_formats": ["wav", "mp3", "flac", "m4a"],
+      "allowed_image_formats": ["jpg", "jpeg", "png", "webp"]
+    }
+  },
+  
+  "performance": {
+    "caching": {
+      "enabled": true,
+      "cache_dir": ".cache",
+      "max_cache_size_gb": 10
+    },
+    "batch_processing": {
+      "enabled": true,
+      "max_batch_size": 8
+    },
+    "gpu_acceleration": {
+      "enabled": false,
+      "device": "cuda:0"
+    }
+  },
+  
+  "monitoring": {
+    "metrics_collection": {
+      "enabled": true,
+      "metrics": [
+        "request_count",
+        "success_rate",
+        "average_duration",
+        "error_rate",
+        "quality_score"
+      ]
+    },
+    "logging": {
+      "level": "INFO",
+      "log_file": "logs/agent.log",
+      "max_file_size_mb": 100,
+      "backup_count": 5
+    }
+  },
+  
+  "datasets": {
+    "phin_isan": {
+      "path": "phin_ai_dataset",
+      "structure": {
+        "audio_sources": "audio_sources",
+        "processed_audio": "processed_audio",
+        "sheet_music": "sheet_music",
+        "research_papers": "research_papers",
+        "documentation": "documentation"
+      },
+      "lai_phin_patterns": [
+        {
+          "name": "ลายมโหรีอีสาน",
+          "name_en": "Lai Mahoree Isan",
+          "priority": "high",
+          "target_videos": 20,
+          "collected": 1
+        },
+        {
+          "name": "ลายนกไส่บินข้ามทุ่ง",
+          "name_en": "Nok Sai",
+          "priority": "high",
+          "target_videos": 20,
+          "collected": 0
+        },
+        {
+          "name": "ลายแมลงภู่ตอมดอกไม้",
+          "name_en": "Maleng Phu",
+          "priority": "high",
+          "target_videos": 20,
+          "collected": 0
+        },
+        {
+          "name": "ลายเต้ยโขง",
+          "name_en": "Toei Khong",
+          "priority": "high",
+          "target_videos": 15,
+          "collected": 0
+        },
+        {
+          "name": "ลายเซิ้งบั้งไฟ",
+          "name_en": "Soeng Bang Fai",
+          "priority": "high",
+          "target_videos": 15,
+          "collected": 0
+        }
+      ]
+    }
+  },
+  
+  "metadata": {
+    "project_name": "Phin Isan AI",
+    "version": "1.0.0",
+    "authors": ["Phin Isan AI Team"],
+    "license": "MIT",
+    "repository": "https://github.com/your-repo/phin-isan-ai",
+    "documentation": "https://your-docs-url.com",
+    "contact": "your-email@example.com"
+  }
+}
