@@ -15,6 +15,7 @@ import logging
 from agents.image_analyzer import ImageAnalyzer
 from agents.music_generator import MusicGenerator
 from agents.audio_transcriber import AudioTranscriber
+from agents.agent_router import AgentRouterClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -44,6 +45,174 @@ class MusicConfig:
     def get_model_config(self, model_type: str, model_name: str) -> Dict[str, Any]:
         """Get model configuration"""
         return self.config.get("models", {}).get(model_type, {}).get(model_name, {})
+
+
+class MusicOrchestrator:
+    """Orchestrate music generation with Agent Router support"""
+    
+    def __init__(self, config_path: str = "mcp.json", use_agent_router: bool = False):
+        """
+        Initialize music orchestrator
+        
+        Args:
+            config_path: Path to mcp.json configuration
+            use_agent_router: Whether to use Agent Router for orchestration
+        """
+        self.config = MusicConfig(config_path)
+        self.use_agent_router = use_agent_router
+        
+        # Initialize Agent Router if enabled
+        self.router_client = None
+        if use_agent_router:
+            self.router_client = AgentRouterClient()
+            logger.info("Agent Router enabled")
+        
+        # Initialize local agents
+        self.agents = {}
+        self._init_agents()
+    
+    def _init_agents(self):
+        """Initialize all agents"""
+        test_mode = os.getenv("TEST_MODE", "false").lower() == "true"
+        
+        if not test_mode:
+            try:
+                # Image Analyzer
+                image_config = self.config.get_agent_config("image_to_music")
+                self.agents["image_analyzer"] = ImageAnalyzer(image_config)
+                
+                # Music Generator
+                music_config = self.config.get_agent_config("text_to_music")
+                self.agents["music_generator"] = MusicGenerator(music_config)
+                
+                # Audio Transcriber
+                audio_config = self.config.get_agent_config("audio_to_midi")
+                self.agents["audio_transcriber"] = AudioTranscriber(audio_config)
+                
+                logger.info("All agents initialized successfully")
+                
+                # Register with Agent Router if enabled
+                if self.router_client:
+                    self._register_agents()
+                    
+            except Exception as e:
+                logger.error(f"Failed to initialize agents: {e}")
+        else:
+            logger.info("Running in TEST MODE - agents not initialized")
+    
+    def _register_agents(self):
+        """Register agents with Agent Router"""
+        if not self.router_client:
+            return
+        
+        agents_to_register = [
+            {
+                "name": "phin_isan_image_analyzer",
+                "capabilities": ["image_understanding", "music_description_generation"],
+                "metadata": {"type": "vision_language", "provider": "openai"}
+            },
+            {
+                "name": "phin_isan_music_generator",
+                "capabilities": ["text_to_music", "music_generation"],
+                "metadata": {"type": "music_gen", "provider": "meta"}
+            },
+            {
+                "name": "phin_isan_audio_transcriber",
+                "capabilities": ["audio_to_midi", "transcription"],
+                "metadata": {"type": "audio_processing", "provider": "spotify"}
+            }
+        ]
+        
+        for agent_info in agents_to_register:
+            result = self.router_client.register_agent(
+                agent_name=agent_info["name"],
+                capabilities=agent_info["capabilities"],
+                metadata=agent_info["metadata"]
+            )
+            if result.get("success"):
+                logger.info(f"Registered {agent_info['name']} with Agent Router")
+            else:
+                logger.warning(f"Failed to register {agent_info['name']}: {result.get('error')}")
+    
+    def generate_from_image(self,
+                           image_path: str,
+                           user_prompt: Optional[str] = None,
+                           duration: int = 10,
+                           guidance_scale: float = 3.5,
+                           output_path: str = "output.wav") -> Dict[str, Any]:
+        """
+        Generate music from an image
+        
+        Args:
+            image_path: Path to input image
+            user_prompt: Optional user guidance
+            duration: Music duration in seconds
+            guidance_scale: How closely to follow the prompt
+            output_path: Output audio file path
+            
+        Returns:
+            Dictionary with generation results
+        """
+        # Route through Agent Router if enabled
+        if self.router_client:
+            result = self.router_client.route_request(
+                task_type="image_to_music",
+                input_data={
+                    "image_path": image_path,
+                    "user_prompt": user_prompt,
+                    "duration": duration,
+                    "guidance_scale": guidance_scale
+                },
+                agents=["phin_isan_image_analyzer", "phin_isan_music_generator"]
+            )
+            
+            if result.get("success"):
+                return result
+        
+        # Fallback to local execution
+        logger.info(f"Generating music from image: {image_path}")
+        
+        # Step 1: Analyze image
+        music_description = self.agents["image_analyzer"].analyze(
+            image_path=image_path,
+            user_guidance=user_prompt
+        )
+        
+        # Step 2: Generate music
+        music_result = self.agents["music_generator"].generate(
+            prompt=music_description,
+            duration=duration,
+            guidance_scale=guidance_scale,
+            output_path=output_path
+        )
+        
+        return {
+            "success": True,
+            "music_description": music_description,
+            **music_result
+        }
+    
+    def generate_from_text(self,
+                          prompt: str,
+                          duration: int = 10,
+                          guidance_scale: float = 3.5,
+                          output_path: str = "output.wav") -> Dict[str, Any]:
+        """Generate music from text prompt"""
+        return self.agents["music_generator"].generate(
+            prompt=prompt,
+            duration=duration,
+            guidance_scale=guidance_scale,
+            output_path=output_path
+        )
+    
+    def transcribe_audio(self,
+                        audio_path: str,
+                        output_path: str = "output.mid") -> Dict[str, Any]:
+        """Transcribe audio to MIDI"""
+        return self.agents["audio_transcriber"].transcribe(
+            audio_path=audio_path,
+            output_path=output_path
+        )
 
 
 class ImageToMusicAgent:

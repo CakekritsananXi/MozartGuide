@@ -55,6 +55,8 @@ Examples:
                        help="Configuration file (default: mcp.json)")
     parser.add_argument("--test-mode", action="store_true",
                        help="Run in test mode without loading models")
+    parser.add_argument("--use-agent-router", action="store_true",
+                       help="Use Agent Router for orchestration")
     
     # Utility
     parser.add_argument("--verbose", action="store_true",
@@ -69,7 +71,10 @@ Examples:
     
     # Initialize orchestrator
     try:
-        orchestrator = MusicOrchestrator(config_path=args.config)
+        orchestrator = MusicOrchestrator(
+            config_path=args.config,
+            use_agent_router=args.use_agent_router
+        )
     except Exception as e:
         print(f"❌ Error initializing orchestrator: {e}")
         return 1

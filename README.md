@@ -12,6 +12,7 @@
 - **Video-to-Music**: Create synchronized soundtracks for video content
 - **Audio-to-MIDI**: Transcribe Phin audio recordings to MIDI format
 - **Multi-Agent Architecture**: Modular design with specialized AI agents
+- **Agent Router Integration**: Optional routing and orchestration via Agent Router AI
 - **REST API**: FastAPI-based web service for remote access
 - **Interactive UI**: Streamlit web interface for easy usage
 
@@ -51,6 +52,9 @@ python main.py --image path/to/image.jpg --output music.wav
 
 # With custom duration and guidance
 python main.py --image photo.jpg --duration 20 --guidance 4.0
+
+# Use Agent Router for orchestration
+python main.py --image photo.jpg --use-agent-router
 
 # Generate from text prompt
 python main.py --prompt "Calm ambient music with soft piano" --output ambient.wav
