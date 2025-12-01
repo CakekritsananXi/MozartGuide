@@ -11,6 +11,11 @@ from typing import Dict, Any, Optional
 from pathlib import Path
 import logging
 
+# Import real agents
+from agents.image_analyzer import ImageAnalyzer
+from agents.music_generator import MusicGenerator
+from agents.audio_transcriber import AudioTranscriber
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,6 +52,9 @@ class ImageToMusicAgent:
     def __init__(self, config: MusicConfig):
         self.config = config.get_agent_config("image_to_music")
         self.test_mode = os.getenv("TEST_MODE", "false").lower() == "true"
+        
+        if not self.test_mode:
+            self.analyzer = ImageAnalyzer(self.config)
     
     def analyze_image(self, image_path: str, user_prompt: Optional[str] = None) -> str:
         """
@@ -62,12 +70,8 @@ class ImageToMusicAgent:
         if self.test_mode:
             return self._mock_analysis(image_path, user_prompt)
         
-        # In production, this would use GPT-4 Vision or similar
         logger.info(f"Analyzing image: {image_path}")
-        
-        # TODO: Implement actual vision-language model integration
-        # For now, return a template-based prompt
-        return self._template_based_prompt(image_path, user_prompt)
+        return self.analyzer.analyze(image_path, user_prompt)
     
     def _mock_analysis(self, image_path: str, user_prompt: Optional[str]) -> str:
         """Mock analysis for testing"""
@@ -101,6 +105,9 @@ class TextToMusicAgent:
     def __init__(self, config: MusicConfig):
         self.config = config.get_agent_config("text_to_music")
         self.test_mode = os.getenv("TEST_MODE", "false").lower() == "true"
+        
+        if not self.test_mode:
+            self.generator = MusicGenerator(self.config)
     
     def generate(self, prompt: str, duration: int = 10, 
                  guidance_scale: float = 3.5, 
@@ -121,16 +128,7 @@ class TextToMusicAgent:
             return self._mock_generation(prompt, duration, output_path)
         
         logger.info(f"Generating music: {prompt[:50]}...")
-        
-        # TODO: Implement actual MusicGen integration
-        # For now, return mock result
-        return {
-            "success": True,
-            "audio_path": output_path,
-            "prompt": prompt,
-            "duration": duration,
-            "guidance_scale": guidance_scale
-        }
+        return self.generator.generate(prompt, duration, guidance_scale, 1.0, output_path)
     
     def _mock_generation(self, prompt: str, duration: int, output_path: str) -> Dict[str, Any]:
         """Mock generation for testing"""
@@ -150,6 +148,9 @@ class AudioToMIDIAgent:
     def __init__(self, config: MusicConfig):
         self.config = config.get_agent_config("audio_to_midi")
         self.test_mode = os.getenv("TEST_MODE", "false").lower() == "true"
+        
+        if not self.test_mode:
+            self.transcriber = AudioTranscriber(self.config)
     
     def transcribe(self, audio_path: str, output_path: str = "output.mid") -> Dict[str, Any]:
         """
@@ -166,14 +167,7 @@ class AudioToMIDIAgent:
             return self._mock_transcription(audio_path, output_path)
         
         logger.info(f"Transcribing audio: {audio_path}")
-        
-        # TODO: Implement Basic Pitch integration
-        return {
-            "success": True,
-            "midi_path": output_path,
-            "audio_path": audio_path,
-            "confidence": 0.0
-        }
+        return self.transcriber.transcribe(audio_path, output_path)
     
     def _mock_transcription(self, audio_path: str, output_path: str) -> Dict[str, Any]:
         """Mock transcription for testing"""
